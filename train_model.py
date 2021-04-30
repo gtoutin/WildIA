@@ -14,31 +14,36 @@ import os
 
 # define what our classifier network will look like. necessary for both loading our model again and starting a model for the first time.
 class Net(nn.Module):
-    def __init__(self):
+    def __init__(self, num_classes: int):
         super().__init__()
-        self.conv1 = nn.Conv2d(3, 220, 5) #????????????
-        self.pool = nn.MaxPool2d(2,2)
-        self.conv2 = nn.Conv2d(106, 102, 5)
-        self.fc1 = nn.Linear(106 * 5 * 5, 120) # fully connected layer
-        self.fc2 = nn.Linear(120, 84)
-        self.fc3 = nn.Linear(84, 4) # 2ND INPUT MUST BE # LABELS
-
+        self.backbone = nn.Sequential(
+            nn.Conv2d(3, 32, 5),
+            nn.ReLU(),
+            nn.MaxPool2d(2,2),
+            nn.Conv2d(32, 64, 3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(2,2),
+            nn.Conv2d(64, 128, 3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(2,2),
+            nn.AdaptiveAvgPool2d(1)
+        )
+        self.output = nn.Sequential(
+            nn.Linear(128, num_classes)
+        )
     def forward(self, x):
-        print(type(x))
-        print(x.size())
-        x = self.pool(F.relu(self.conv1(x)))
-        x = self.pool(F.relu(self.conv2(x)))
-        x = x.view(-1, 106 * 5 * 5) #????????
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
-        x = self.fc3(x)
-        return x
+        x = self.backbone(x)
+        return self.output(x.view(x.shape[0], -1))
 
 
 batch_size = 4  # how many images at a time
 
 # define a CNN. it's an instance of the Net class defined above.
-net = Net()
+net = Net(num_classes=4)
+
+# with torch.no_grad():
+#     output = net(torch.randn(4, 3, 224, 244))
+# print(output)
 
 # load a model if it exists
 if os.path.isfile(PATH):
@@ -79,8 +84,8 @@ for epoch in range(2):  # loop over the dataset multiple times
 
         # forward + backward + optimize
         outputs = net(inputs)
-        print(inputs.size())
-        print(outputs.size())
+        # print(inputs.size())
+        # print(outputs.size())
         loss = criterion(outputs, labels)
         loss.backward()
         optimizer.step()
