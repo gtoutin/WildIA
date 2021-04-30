@@ -22,4 +22,4 @@ Credit for this file goes to Akash Kumar https://github.com/AKASH2907/bird_speci
 
 ## Train the model
 
-Model training occurs in ```train_model.py```.
+Model training occurs in ```train_model.py```. Ensure that the correct path to the training data is defined in the ```DATA``` variable.

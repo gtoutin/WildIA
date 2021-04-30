@@ -1,6 +1,6 @@
 # this is where the model training will occur.
 
-TRAINDIR = './data'  # folder of training and validation data
+TRAINDIR = './train'  # folder of training and validation data
 PATH = './WildIA_net.pth'  # location of saved model
 
 # import stuff
