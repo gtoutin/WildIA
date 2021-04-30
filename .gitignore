@@ -2,3 +2,4 @@ load_example.py
 classifier_example.py
 data/
 birddataset.py
+cifar_net.pth

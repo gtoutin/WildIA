@@ -45,19 +45,25 @@ if os.path.isfile(PATH):
     print('Model loaded.')
 
 
+# normalize PILImage outputs [0 1] to [-1 1] tensors required format
+transform = transforms.Compose(
+    [transforms.ToTensor(),
+     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+
+
 print('Loading dataset...')
 # load the datasets using ImageFolder
-trainset = torchvision.datasets.ImageFolder(root=TRAINDIR)
+trainset = torchvision.datasets.ImageFolder(root=TRAINDIR, transform=transform)
 # get a dataloader to easily navigate thru the dataset for training
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
                                           shuffle=True, num_workers=2)
-print('Dataset loaded.')
+print('Dataset loaded.\n')
 
 # define loss function and optimizer
 criterion = nn.CrossEntropyLoss()  # good criterion for classifiers
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)  # stochastic gradient descent
 
-print('Starting training...')
+print('Starting training...\n')
 # train the net ---------------------------------------------
 for epoch in range(2):  # loop over the dataset multiple times
 
