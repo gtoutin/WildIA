@@ -2,6 +2,7 @@
 
 TRAINDIR = './train'  # folder of training and validation data
 PATH = './WildIA_net.pth'  # location of saved model
+num_classes = 4     # number of species in the model
 
 # import stuff
 import torch
@@ -13,33 +14,33 @@ import torch.optim as optim
 import os
 
 # define what our classifier network will look like. necessary for both loading our model again and starting a model for the first time.
-class Net(nn.Module):
+class Net(nn.Module):  # Thank you Alex!
     def __init__(self, num_classes: int):
         super().__init__()
         self.backbone = nn.Sequential(
-            nn.Conv2d(3, 32, 5),
+            nn.Conv2d(3, 32, 5),  # 1st convolutional layer
             nn.ReLU(),
             nn.MaxPool2d(2,2),
-            nn.Conv2d(32, 64, 3, padding=1),
+            nn.Conv2d(32, 64, 3, padding=1),  # 2nd convolutional layer
             nn.ReLU(),
             nn.MaxPool2d(2,2),
-            nn.Conv2d(64, 128, 3, padding=1),
+            nn.Conv2d(64, 128, 3, padding=1),  # 3rd convolutional layer
             nn.ReLU(),
             nn.MaxPool2d(2,2),
             nn.AdaptiveAvgPool2d(1)
         )
         self.output = nn.Sequential(
-            nn.Linear(128, num_classes)
+            nn.Linear(128, num_classes)  # get output from convolutions
         )
     def forward(self, x):
-        x = self.backbone(x)
-        return self.output(x.view(x.shape[0], -1))
+        x = self.backbone(x)  # get convolutions
+        return self.output(x.view(x.shape[0], -1))  # reshape tensor to 1d and get ouput
 
 
 batch_size = 4  # how many images at a time
 
 # define a CNN. it's an instance of the Net class defined above.
-net = Net(num_classes=4)
+net = Net(num_classes)
 
 # with torch.no_grad():
 #     output = net(torch.randn(4, 3, 224, 244))
@@ -49,7 +50,7 @@ net = Net(num_classes=4)
 if os.path.isfile(PATH):
     print('Loading previous model...')
     net.load_state_dict(torch.load(PATH))
-    print('Model loaded.')
+    print('Model loaded.\n')
 
 
 # normalize PILImage outputs [0 1] to [-1 1] tensors required format
@@ -92,9 +93,9 @@ for epoch in range(2):  # loop over the dataset multiple times
 
         # print statistics
         running_loss += loss.item()
-        if i % 2000 == 1999:    # print every 2000 mini-batches
+        if i % 20 == 19:    # print every 20 mini-batches
             print('[%d, %5d] loss: %.3f' %
-                  (epoch + 1, i + 1, running_loss / 2000))
+                  (epoch + 1, i + 1, running_loss / 20))
             running_loss = 0.0
 
 print('Finished Training!')
