@@ -43,7 +43,7 @@ print('Dataset loaded.\n')
 
 # define loss function and optimizer
 criterion = nn.CrossEntropyLoss()  # good criterion for classifiers
-optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)  # stochastic gradient descent
+optimizer = optim.Adam(net.parameters(), lr=0.001)  # Adam stochastic optimization
 
 print('Starting training...\n')
 # train the net ---------------------------------------------
