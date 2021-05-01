@@ -24,7 +24,7 @@ if os.path.isfile(PATH):
 
 # normalize PILImage outputs [0 1] to [-1 1] tensors required format and resize
 transform = transforms.Compose(
-    [transforms.Resize((224,224)),
+    [transforms.Resize((224,224)),  # need to resize test images
      transforms.ToTensor(),
      transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
@@ -32,6 +32,12 @@ transform = transforms.Compose(
 print('Loading testing dataset...')
 # load the datasets using ImageFolder
 testset = torchvision.datasets.ImageFolder(root=TESTDIR, transform=transform)
+
+# create dictionary to easily display predicted classes
+birdclasses_to_idx = testset.class_to_idx
+idx_to_class = {value:key for key, value in birdclasses_to_idx.items()}
+birdclasses = tuple(birdclasses_to_idx.keys())
+
 # get a dataloader to easily navigate thru the dataset for training
 testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
                                           shuffle=True, num_workers=2)
@@ -41,11 +47,12 @@ images, labels = dataiter.next()    # get images and labels from test data itera
 print('Dataset loaded.\n')
 
 
-# get model output
-outputs = net(images)
+# # get model output
+# outputs = net(images)
 
-# get prediction probabilities and classes
-probs, predicted = torch.max(outputs, 1)
+# # get prediction probabilities and classes
+# probs, predicted = torch.max(outputs, 1)
+# print(predicted)
 
 
 # calculate test accuracy
@@ -58,9 +65,39 @@ with torch.no_grad():
         # calculate outputs by running images through the network
         outputs = net(images)
         # the class with the highest energy is what we choose as prediction
-        _, predicted = torch.max(outputs.data, 1)
+        probs, predicted = torch.max(outputs.data, 1)
         total += labels.size(0)
         correct += (predicted == labels).sum().item()
 
-print('Accuracy of the network on the 10000 test images: %d %%' % (
+#        print('Predicted: ', ' '.join('%5s' % birdclasses[predicted[j]]
+#                              for j in range(len(predicted))))
+
+print('Accuracy of the network on the test images: %d %% \n' % (
     100 * correct / total))
+
+
+
+# print accuracy by class
+
+# prepare to count predictions for each class
+correct_pred = {classname: 0 for classname in birdclasses}
+total_pred = {classname: 0 for classname in birdclasses}
+
+# again no gradients needed
+with torch.no_grad():
+    for data in testloader:
+        images, labels = data
+        outputs = net(images)
+        _, predictions = torch.max(outputs, 1)
+        # collect the correct predictions for each class
+        for label, prediction in zip(labels, predictions):
+            if label == prediction:
+                correct_pred[birdclasses[label]] += 1
+            total_pred[birdclasses[label]] += 1
+
+
+# print accuracy for each class
+for classname, correct_count in correct_pred.items():
+    accuracy = 100 * float(correct_count) / total_pred[classname]
+    print("Accuracy for class {:5s} is: {:.1f} %".format(classname,
+                                                   accuracy))
