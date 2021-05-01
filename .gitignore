@@ -3,3 +3,8 @@ classifier_example.py
 data/
 birddataset.py
 cifar_net.pth
+train/
+test/
+train_data/
+valid/
+__pycache__/
