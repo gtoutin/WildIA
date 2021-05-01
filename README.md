@@ -22,4 +22,12 @@ Credit for this file goes to Akash Kumar https://github.com/AKASH2907/bird_speci
 
 ## Train the model
 
-Model training occurs in ```train_model.py```. Ensure that the correct path to the training data is defined in the ```DATA``` variable.
+Model training occurs in ```train_model.py```.
+Ensure that the correct path to the training data is defined in the ```DATA``` variable. Set ```num_classes``` to the number of categories of labeled data there are (default is 4).
+Run the file to load, train, and save the model.
+
+Credit goes to Alex Witt for his assistance.
+
+## Test the model
+
+Model testing occurs in ```test_model.py```.
