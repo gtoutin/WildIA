@@ -47,14 +47,6 @@ images, labels = dataiter.next()    # get images and labels from test data itera
 print('Dataset loaded.\n')
 
 
-# # get model output
-# outputs = net(images)
-
-# # get prediction probabilities and classes
-# probs, predicted = torch.max(outputs, 1)
-# print(predicted)
-
-
 # calculate test accuracy
 correct = 0
 total = 0
