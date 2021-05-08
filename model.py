@@ -1,6 +1,45 @@
 # class definition for the WildIA CNN
+import pathlib
+
+import albumentations as alb
+import cv2
 import torch
+from torch.utils import data
 from torch import nn
+
+
+class ParrotDataset(data.Dataset):
+    def __init__(self, inputpath, CLASSES, split=''):
+        self.augmentations = alb.Compose(
+            [
+                alb.Resize(224, 224),
+                alb.Flip(),
+                alb.RandomBrightnessContrast(),
+                alb.HueSaturationValue(),
+                alb.RandomGamma(),
+                alb.Normalize(),
+            ]
+        )
+        self.CLASSES = CLASSES
+
+        _DATA_DIR = pathlib.Path(inputpath)
+        
+        data_dir = _DATA_DIR / split
+        assert data_dir.is_dir()
+        self.imgs = [img for img in list(data_dir.rglob("*")) if img.is_file()]
+
+    def __len__(self):
+        return len(self.imgs)
+
+    def __str__(self):
+        return f"{len(self.imgs)} images."
+
+    def __getitem__(self, idx: int):
+        class_name = self.imgs[idx].parent.name
+        image = cv2.imread(str(self.imgs[idx]))
+        assert image is not None, self.imgs[idx]
+        image = self.augmentations(image=image)["image"]
+        return torch.Tensor(image), self.CLASSES.index(class_name)
 
 
 # define what our classifier network will look like. necessary for both loading our model again and starting a model for the first time.
