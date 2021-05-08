@@ -1,6 +1,12 @@
-torch==1.8.1
-torchvision==0.9.1
+albumentations
+opencv-python
+torch
+torchvision
 numpy
 pillow
-opencv-python
 git+https://github.com/aleju/imgaug
+fire
+pickle
+logging
+pandas
+PySimpleGUI
