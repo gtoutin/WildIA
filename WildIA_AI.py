@@ -1,6 +1,7 @@
 # this file defines a way to abstract away all the AI image in -> prediction out
 import model
 import torch
+import os
 
 CLASSES = [
     "RAINBOW_LORIKEET",
@@ -10,40 +11,43 @@ CLASSES = [
     "SWIFT PARROT",
     "EMPTY"
 ]
-
+MODELPATH = 'WildIA_net.pth'
 batch_size = 16
 
 net = model.Net(len(CLASSES))
+
+if os.path.isfile(MODELPATH):
+    print("Loading previous model...")
+    net.load_state_dict(torch.load(MODELPATH))
+    print("Model loaded.\n")
 
 def classify(imagepath):
     '''
     Input: image path
     Output: species name, probability
     '''
-    classifications = {}    # dict with classification: probability
+    classifications = []    # list of classified things in order
 
 
     print("Loading images...")
     classify_imgs = model.ParrotDataset(imagepath, CLASSES)
     print("Images found...")
     classify_loader = torch.utils.data.DataLoader(
-        classify_imgs, batch_size=batch_size, shuffle=False, num_workers=2
+        classify_imgs, batch_size=batch_size, shuffle=True, num_workers=2
     )
     print("Images loaded.\n")
 
-    # class_accuracy = {idx: [] for idx in range(len(CLASSES))}
 
-    for idx, (images, labels) in enumerate(classify_loader):
-        outputs = net(images)
-        probs, predicted = torch.max(outputs.data, 1)
+    print("Starting inference...\n")
 
-    #     for prediction, label in zip(predicted, labels):
-    #         class_idx = label.item()
-    #         class_accuracy[class_idx].append(prediction)
+    with torch.no_grad():
+        # Once done with train_loader, run validation
+        for images, labels in classify_loader:
+            images = images.permute(0,3,1,2)
+            outputs = net(images)
+            probs, predicted = torch.max(outputs.data, 1)
+            for prediction, label in zip(predicted, labels):
+                class_idx = label.item()
+                classifications.append(CLASSES[prediction])
 
-    # print(class_accuracy)
-
-        print('Predicted: ', ' '.join('%5s' % CLASSES[predicted[j]]
-                                for j in range(4)))
-
-    return probs, predicted
+    return classifications
