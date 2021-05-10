@@ -7,6 +7,8 @@ from pathlib import Path
 import os
 import WildIA_AI as testModel
 
+os.environ['KMP_DUPLICATE_LIB_OK']='True'
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -26,7 +28,7 @@ class Classifier:
         event, values = sg.Window("WildIA GUI").Layout(layout).Read()
 
         predict_data_path = os.path.relpath(values[0])
-        output_path = './'+values[1]
+        output_path = './Outputs/'+values[1]+'.csv'
 
         print(predict_data_path)
         print(output_path)
@@ -46,12 +48,22 @@ class Classifier:
         model = testModel
 
         logger.info("Running model predictions...")
-        probs, predicted = model.classify(X)
+        classifications = model.classify(X)
 
         logger.info(f"Saving predictions to {output_path} ...")
-        #pandas.DataFrame(y_pred).to_csv(output_path)
+        df = pandas.DataFrame(classifications)
+        df.index.name = 'filenames'
 
-        
+        print(df)
+
+        i=0
+        for filename in os.listdir(predict_data_path):
+            if filename.endswith(".jpg"):
+                df = df.rename(index={i : filename})
+                i += 1
+
+        df.to_csv(output_path, header=['classifications'])
+                
 
         logger.info("Successfully predicted.")
 
