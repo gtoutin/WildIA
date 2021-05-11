@@ -6,7 +6,5 @@ numpy
 pillow
 git+https://github.com/aleju/imgaug
 fire
-pickle
-logging
 pandas
 PySimpleGUI
