@@ -25,38 +25,3 @@ mkdir Output
 To use the CLI, stay in the project folder and run ```python3 WildIA_CLI.py predict``` 
 The model will be loaded and soon after a small window will appear to allow you to select the input images and output CSV file.  
 After the CLI is finished running, you will have your top-1 classification for each image in the CSV file.
-
-
-# Customizing the model
-
-This model can be fine-tuned for your needs. Fork or clone this repository and retrain the model to suit your requirements.
-
-## Training the model
-
-Model training happens in 
-
-## Data augmentation
-
-These are relatively small training datasets, so run ```data_augmentation.py``` to apply image filters to strengthen the model.
-
-Credit for this file goes to Akash Kumar https://github.com/AKASH2907/bird_species_classification.
-
-## Create validation datasets.
-
-The model must be validated. Run ```create_validation.py``` to do this. This will create a folder called ```valid``` where the validation images are stored.
-
-Credit for this file goes to Akash Kumar https://github.com/AKASH2907/bird_species_classification.
-
-## Train the model
-
-Model training occurs in ```train_model.py```.
-Ensure that the correct path to the training data is defined in the ```TRAINDIR``` variable. Set ```num_classes``` to the number of categories of labeled data there are (default is 4).
-Run the file to load, train, and save the model.
-
-Credit goes to Alex Witt for his assistance.
-
-## Test the model
-
-Model testing occurs in ```test_model.py```.
-Ensure that the correct path to the testing data is defined in the ```TESTDIR``` variable. Set ```num_classes``` to the number of categories of labeled data there are (default is 4). Set ```batch_size``` to be how many images are tested at once (default is 4).
-Run the file to load, train, and save the model.
